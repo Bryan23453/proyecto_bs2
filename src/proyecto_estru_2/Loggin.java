@@ -6,9 +6,8 @@ package proyecto_estru_2;
 
 import java.awt.Label;
 import java.net.URL;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
+import java.util.HashSet;
+import javax.swing.*;
 
 /**
  *
@@ -19,6 +18,21 @@ public class Loggin extends javax.swing.JFrame {
     /**
      * Creates new form Loggin
      */
+    ConexionMariaDB conexMariaDB = new ConexionMariaDB();
+    ConexionSQLServer conexSQLServer = new ConexionSQLServer();
+    //Datos MariaDB
+    String hostMariaDB = "databasemariadb.c4rmmgpbufto.us-east-1.rds.amazonaws.com";
+    String portMariaDB = "3306";
+    String dbNameMariaDB = "prueba";
+    String userNameMariaDB = "admin";
+    String userPassMariaDB = "admin123";
+    
+    //Datos SQLServer
+    String hostSQLServer = "databasesqlserver.c4rmmgpbufto.us-east-1.rds.amazonaws.com";
+    String portSQLServer = "1433";
+    String dbNameSQLServer = "prueba";
+    String userNameSQLServer = "admin";
+    String userPassSQLServer = "admin123";
     public Loggin() {
         initComponents();
         this.setResizable(false);
@@ -53,25 +67,25 @@ public class Loggin extends javax.swing.JFrame {
         jLabel23 = new javax.swing.JLabel();
         jLabel24 = new javax.swing.JLabel();
         jLabel25 = new javax.swing.JLabel();
-        Puerto1 = new javax.swing.JTextField();
+        Nom_Puerto1 = new javax.swing.JTextField();
         Boton_Probar_Coneccion1 = new javax.swing.JButton();
         Nom_Insta_1 = new javax.swing.JTextField();
         jLabel41 = new javax.swing.JLabel();
         Nom_BaseDato_1 = new javax.swing.JTextField();
         Nom_Usu1 = new javax.swing.JTextField();
         jLabel42 = new javax.swing.JLabel();
-        Pass_1 = new javax.swing.JTextField();
+        Nom_Pass_1 = new javax.swing.JTextField();
         jLabel52 = new javax.swing.JLabel();
         jLabel29 = new javax.swing.JLabel();
         Nom_Insta_2 = new javax.swing.JTextField();
         jLabel43 = new javax.swing.JLabel();
         Nom_BaseDato_2 = new javax.swing.JTextField();
         jLabel30 = new javax.swing.JLabel();
-        Puerto2 = new javax.swing.JTextField();
+        Nom_Puerto2 = new javax.swing.JTextField();
         jLabel47 = new javax.swing.JLabel();
         Nom_Usu2 = new javax.swing.JTextField();
         jLabel56 = new javax.swing.JLabel();
-        Pass_3 = new javax.swing.JTextField();
+        Nom_Pass_2 = new javax.swing.JTextField();
         Boton_Guardar_db = new javax.swing.JButton();
         jLabel31 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
@@ -182,10 +196,10 @@ public class Loggin extends javax.swing.JFrame {
         Panel_Conexiones.add(jLabel25);
         jLabel25.setBounds(710, 20, 260, 30);
 
-        Puerto1.setBackground(new java.awt.Color(102, 102, 102));
-        Puerto1.setForeground(new java.awt.Color(255, 255, 255));
-        Panel_Conexiones.add(Puerto1);
-        Puerto1.setBounds(130, 270, 210, 30);
+        Nom_Puerto1.setBackground(new java.awt.Color(102, 102, 102));
+        Nom_Puerto1.setForeground(new java.awt.Color(255, 255, 255));
+        Panel_Conexiones.add(Nom_Puerto1);
+        Nom_Puerto1.setBounds(130, 270, 210, 30);
 
         Boton_Probar_Coneccion1.setBackground(new java.awt.Color(204, 204, 204));
         Boton_Probar_Coneccion1.setForeground(new java.awt.Color(0, 0, 0));
@@ -225,10 +239,10 @@ public class Loggin extends javax.swing.JFrame {
         Panel_Conexiones.add(jLabel42);
         jLabel42.setBounds(130, 310, 150, 30);
 
-        Pass_1.setBackground(new java.awt.Color(102, 102, 102));
-        Pass_1.setForeground(new java.awt.Color(255, 255, 255));
-        Panel_Conexiones.add(Pass_1);
-        Pass_1.setBounds(130, 410, 210, 30);
+        Nom_Pass_1.setBackground(new java.awt.Color(102, 102, 102));
+        Nom_Pass_1.setForeground(new java.awt.Color(255, 255, 255));
+        Panel_Conexiones.add(Nom_Pass_1);
+        Nom_Pass_1.setBounds(130, 410, 210, 30);
 
         jLabel52.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel52.setForeground(new java.awt.Color(137, 250, 230));
@@ -264,10 +278,10 @@ public class Loggin extends javax.swing.JFrame {
         Panel_Conexiones.add(jLabel30);
         jLabel30.setBounds(730, 240, 130, 30);
 
-        Puerto2.setBackground(new java.awt.Color(102, 102, 102));
-        Puerto2.setForeground(new java.awt.Color(255, 255, 255));
-        Panel_Conexiones.add(Puerto2);
-        Puerto2.setBounds(730, 270, 210, 30);
+        Nom_Puerto2.setBackground(new java.awt.Color(102, 102, 102));
+        Nom_Puerto2.setForeground(new java.awt.Color(255, 255, 255));
+        Panel_Conexiones.add(Nom_Puerto2);
+        Nom_Puerto2.setBounds(730, 270, 210, 30);
 
         jLabel47.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel47.setForeground(new java.awt.Color(137, 250, 230));
@@ -286,10 +300,10 @@ public class Loggin extends javax.swing.JFrame {
         Panel_Conexiones.add(jLabel56);
         jLabel56.setBounds(730, 380, 130, 30);
 
-        Pass_3.setBackground(new java.awt.Color(102, 102, 102));
-        Pass_3.setForeground(new java.awt.Color(255, 255, 255));
-        Panel_Conexiones.add(Pass_3);
-        Pass_3.setBounds(730, 410, 210, 30);
+        Nom_Pass_2.setBackground(new java.awt.Color(102, 102, 102));
+        Nom_Pass_2.setForeground(new java.awt.Color(255, 255, 255));
+        Panel_Conexiones.add(Nom_Pass_2);
+        Nom_Pass_2.setBounds(730, 410, 210, 30);
 
         Boton_Guardar_db.setBackground(new java.awt.Color(204, 204, 204));
         Boton_Guardar_db.setForeground(new java.awt.Color(0, 0, 0));
@@ -440,11 +454,24 @@ public class Loggin extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void Boton_Probar_Coneccion1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Boton_Probar_Coneccion1MouseClicked
+        conexMariaDB.setHost(Nom_Insta_1.getText());
+        conexMariaDB.setdbName(Nom_BaseDato_1.getText());
+        conexMariaDB.setPort(Nom_Puerto1.getText());
+        conexMariaDB.setUser(Nom_Usu1.getText());
+        conexMariaDB.setPass(Nom_Pass_1.getText());
         //este metodo hace que se vea la imagen de work
         jPanel5.setVisible(true);
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
+                
+                conexMariaDB.conectarMariaDB();
+                if(conexMariaDB.getConectado() == true){
+                    JOptionPane.showMessageDialog(null, "Conectado Exitosamente a MariaDB");
+                }
+                else{
+                    JOptionPane.showMessageDialog(null, "Conexion Fallida a MariaDB");
+                }
                 //aqui pones las lineas de la db para que aparezca la imagen 
                 jPanel5.setVisible(false);
             }
@@ -468,16 +495,36 @@ public class Loggin extends javax.swing.JFrame {
 
     private void Boton_Guardar_dbMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Boton_Guardar_dbMouseClicked
         //este metodo hace que se vea la imagen de work
+        conexMariaDB.setHost(Nom_Insta_1.getText());
+        conexMariaDB.setdbName(Nom_BaseDato_1.getText());
+        conexMariaDB.setPort(Nom_Puerto1.getText());
+        conexMariaDB.setUser(Nom_Usu1.getText());
+        conexMariaDB.setPass(Nom_Pass_1.getText());
+
+        conexSQLServer.setHost(Nom_Insta_2.getText());
+        conexSQLServer.setdbName(Nom_BaseDato_2.getText());
+        conexSQLServer.setPort(Nom_Puerto2.getText());
+        conexSQLServer.setUser(Nom_Usu2.getText());
+        conexSQLServer.setPass(Nom_Pass_2.getText());
+        
+        hostMariaDB = Nom_Insta_1.getText();
+        dbNameMariaDB = Nom_BaseDato_1.getText();
+        portMariaDB = Nom_Puerto1.getText();
+        userNameMariaDB = Nom_Usu1.getText();
+        userPassMariaDB = Nom_Pass_1.getText();
+        
+        hostSQLServer = Nom_Insta_2.getText();
+        dbNameSQLServer = Nom_BaseDato_2.getText();
+        portSQLServer = Nom_Puerto2.getText();
+        userNameSQLServer = Nom_Usu2.getText();
+        userPassSQLServer = Nom_Pass_2.getText();
+        
+                
         jPanel5.setVisible(true);
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
                 //aqui pones las lineas de la db para que aparezca la imagen 
-                
-                //ejemplo usa este boton
-                for (int i = 0; i < 50000; i++) {
-                    System.out.println("r");
-                }
                 
                 jPanel5.setVisible(false);
             }
@@ -486,11 +533,23 @@ public class Loggin extends javax.swing.JFrame {
     }//GEN-LAST:event_Boton_Guardar_dbMouseClicked
 
     private void Boton_Probar_Coneccion2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Boton_Probar_Coneccion2MouseClicked
+        conexSQLServer.setHost(Nom_Insta_2.getText());
+        conexSQLServer.setdbName(Nom_BaseDato_2.getText());
+        conexSQLServer.setPort(Nom_Puerto2.getText());
+        conexSQLServer.setUser(Nom_Usu2.getText());
+        conexSQLServer.setPass(Nom_Pass_2.getText());        
         //este metodo hace que se vea la imagen de work
         jPanel5.setVisible(true);
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
+                conexSQLServer.conectarSQLServer();
+                if(conexSQLServer.getConectado() == true){
+                    JOptionPane.showMessageDialog(null, "Conectado Exitosamente a SQLServer");
+                }
+                else{
+                    JOptionPane.showMessageDialog(null, "Conexion Fallida a SQLServer");
+                }
                 //aqui pones las lineas de la db para que aparezca la imagen 
                 jPanel5.setVisible(false);
             }
@@ -516,6 +575,8 @@ public class Loggin extends javax.swing.JFrame {
         URL urlImagen = getClass().getResource(rutaImagen);
         ImageIcon icono = new ImageIcon(urlImagen);
         Icono_Conectado.setIcon(icono);
+        establecerDatosMariaDB();
+        establecerDatosSQLServer();
     }//GEN-LAST:event_Icono_ConectadoMouseEntered
 
     private void Icono_ConectadoMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Icono_ConectadoMouseExited
@@ -540,8 +601,13 @@ public class Loggin extends javax.swing.JFrame {
     }//GEN-LAST:event_Icono_replicaMouseExited
 
     private void Icono_replicaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Icono_replicaMouseClicked
-        Cambio_Menu CM= new Cambio_Menu(Panel_Replica,Panel_Conexiones);
-        CM.start();
+        if(conexMariaDB.getConectado() == true && conexSQLServer.getConectado() == true){
+            Cambio_Menu CM= new Cambio_Menu(Panel_Replica,Panel_Conexiones);
+            CM.start();
+        }
+        else{
+            JOptionPane.showMessageDialog(null, "Debe Establecer Conexiones Primero");
+        }
     }//GEN-LAST:event_Icono_replicaMouseClicked
 
     private void Icono_ConectadoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Icono_ConectadoMouseClicked
@@ -604,9 +670,31 @@ public class Loggin extends javax.swing.JFrame {
     }//GEN-LAST:event_Flecha_IzquierdaMouseExited
 
     private void jLabel72MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel72MouseClicked
+        if(conexMariaDB.getConectado() == true){
+            conexMariaDB.desconectar();
+        }
+        if(conexSQLServer.getConectado() == true){
+            conexSQLServer.desconectar();
+        }
         System.exit(0);
+        
     }//GEN-LAST:event_jLabel72MouseClicked
-
+    private void establecerDatosMariaDB(){
+        //Base de Datos Origen
+        Nom_Insta_1.setText(hostMariaDB);
+        Nom_BaseDato_1.setText(dbNameMariaDB);
+        Nom_Puerto1.setText(portMariaDB);
+        Nom_Usu1.setText(userNameMariaDB);
+        Nom_Pass_1.setText(userPassMariaDB);
+    }
+    private void establecerDatosSQLServer(){
+        //Base de Datos Origen
+        Nom_Insta_2.setText(hostSQLServer);
+        Nom_BaseDato_2.setText(dbNameSQLServer);
+        Nom_Puerto2.setText(portSQLServer);
+        Nom_Usu2.setText(userNameSQLServer);
+        Nom_Pass_2.setText(userPassSQLServer);
+    }
     /**
      * @param args the command line arguments
      */
@@ -660,14 +748,14 @@ public class Loggin extends javax.swing.JFrame {
     private javax.swing.JTextField Nom_BaseDato_2;
     private javax.swing.JTextField Nom_Insta_1;
     private javax.swing.JTextField Nom_Insta_2;
+    private javax.swing.JTextField Nom_Pass_1;
+    private javax.swing.JTextField Nom_Pass_2;
+    private javax.swing.JTextField Nom_Puerto1;
+    private javax.swing.JTextField Nom_Puerto2;
     private javax.swing.JTextField Nom_Usu1;
     private javax.swing.JTextField Nom_Usu2;
     private javax.swing.JPanel Panel_Conexiones;
     private javax.swing.JPanel Panel_Replica;
-    private javax.swing.JTextField Pass_1;
-    private javax.swing.JTextField Pass_3;
-    private javax.swing.JTextField Puerto1;
-    private javax.swing.JTextField Puerto2;
     private javax.swing.JTable Tabla_replicada;
     private javax.swing.JTable Tabla_sin_replicar;
     private javax.swing.JLabel jLabel1;
