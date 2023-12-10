@@ -5,6 +5,7 @@
 package proyecto_estru_2;
 
 import java.awt.Label;
+import java.sql.*;
 import java.net.URL;
 import java.util.HashSet;
 import javax.swing.*;
@@ -604,6 +605,15 @@ public class Loggin extends javax.swing.JFrame {
         if(conexMariaDB.getConectado() == true && conexSQLServer.getConectado() == true){
             Cambio_Menu CM= new Cambio_Menu(Panel_Replica,Panel_Conexiones);
             CM.start();
+            try{
+                Statement st = conexMariaDB.conexion.createStatement();
+                String qt = "CALL CrearTriggerParaTablas();";
+                st.executeUpdate(qt);
+                st.close();
+            }
+            catch(SQLException e){
+                e.printStackTrace();
+            }
         }
         else{
             JOptionPane.showMessageDialog(null, "Debe Establecer Conexiones Primero");
