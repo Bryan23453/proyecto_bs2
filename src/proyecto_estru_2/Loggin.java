@@ -8,9 +8,19 @@ import java.awt.Label;
 import java.sql.*;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -22,6 +32,8 @@ public class Loggin extends javax.swing.JFrame {
     /**
      * Creates new form Loggin
      */
+    ArrayList<String> tablasAgregadas = new ArrayList<>();
+    
     ConexionMariaDB conexMariaDB = new ConexionMariaDB();
     ConexionSQLServer conexSQLServer = new ConexionSQLServer();
     //Datos MariaDB
@@ -97,15 +109,18 @@ public class Loggin extends javax.swing.JFrame {
         Boton_Probar_Coneccion2 = new javax.swing.JButton();
         Panel_Replica = new javax.swing.JPanel();
         Boton_Guardar_Replicas = new javax.swing.JButton();
-        jScrollPane5 = new javax.swing.JScrollPane();
-        Tabla_sin_replicar = new javax.swing.JTable();
         Boton_Cancelar_Replicas = new javax.swing.JButton();
-        jScrollPane6 = new javax.swing.JScrollPane();
-        Tabla_replicada = new javax.swing.JTable();
         jLabel32 = new javax.swing.JLabel();
         jLabel33 = new javax.swing.JLabel();
         Flecha_Izquierda = new javax.swing.JLabel();
         Flecha_Derecha = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        Lista_Tablas_Origen = new javax.swing.JList<>();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        Lista_Tablas_Replica = new javax.swing.JList<>();
+        btn_Job = new javax.swing.JButton();
+        lbl_FechaEjecutada = new javax.swing.JLabel();
+        lbl_horaEjecucion = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         Fondo5 = new javax.swing.JLabel();
         Fondo4 = new javax.swing.JLabel();
@@ -360,21 +375,7 @@ public class Loggin extends javax.swing.JFrame {
             }
         });
         Panel_Replica.add(Boton_Guardar_Replicas);
-        Boton_Guardar_Replicas.setBounds(370, 490, 110, 40);
-
-        Tabla_sin_replicar.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-
-            },
-            new String [] {
-                "Tabla"
-            }
-        ));
-        Tabla_sin_replicar.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        jScrollPane5.setViewportView(Tabla_sin_replicar);
-
-        Panel_Replica.add(jScrollPane5);
-        jScrollPane5.setBounds(20, 80, 310, 450);
+        Boton_Guardar_Replicas.setBounds(370, 460, 110, 40);
 
         Boton_Cancelar_Replicas.setBackground(new java.awt.Color(204, 204, 204));
         Boton_Cancelar_Replicas.setForeground(new java.awt.Color(0, 0, 0));
@@ -385,20 +386,7 @@ public class Loggin extends javax.swing.JFrame {
             }
         });
         Panel_Replica.add(Boton_Cancelar_Replicas);
-        Boton_Cancelar_Replicas.setBounds(530, 490, 110, 40);
-
-        Tabla_replicada.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-
-            },
-            new String [] {
-                "Tabla"
-            }
-        ));
-        jScrollPane6.setViewportView(Tabla_replicada);
-
-        Panel_Replica.add(jScrollPane6);
-        jScrollPane6.setBounds(690, 80, 310, 450);
+        Boton_Cancelar_Replicas.setBounds(530, 460, 110, 40);
 
         jLabel32.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel32.setForeground(new java.awt.Color(137, 250, 230));
@@ -442,6 +430,40 @@ public class Loggin extends javax.swing.JFrame {
         });
         Panel_Replica.add(Flecha_Derecha);
         Flecha_Derecha.setBounds(440, 150, 110, 110);
+
+        jScrollPane1.setViewportView(Lista_Tablas_Origen);
+
+        Panel_Replica.add(jScrollPane1);
+        jScrollPane1.setBounds(10, 80, 300, 450);
+
+        jScrollPane2.setViewportView(Lista_Tablas_Replica);
+
+        Panel_Replica.add(jScrollPane2);
+        jScrollPane2.setBounds(720, 80, 280, 450);
+
+        btn_Job.setBackground(new java.awt.Color(204, 204, 204));
+        btn_Job.setForeground(new java.awt.Color(0, 0, 0));
+        btn_Job.setText("Ejecutar Job");
+        btn_Job.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btn_JobMouseClicked(evt);
+            }
+        });
+        Panel_Replica.add(btn_Job);
+        btn_Job.setBounds(450, 530, 130, 40);
+
+        lbl_FechaEjecutada.setBackground(new java.awt.Color(204, 204, 204));
+        lbl_FechaEjecutada.setForeground(new java.awt.Color(0, 0, 0));
+        lbl_FechaEjecutada.setText("Ultima Fecha Job");
+        Panel_Replica.add(lbl_FechaEjecutada);
+        lbl_FechaEjecutada.setBounds(320, 10, 400, 20);
+
+        lbl_horaEjecucion.setBackground(new java.awt.Color(204, 204, 204));
+        lbl_horaEjecucion.setForeground(new java.awt.Color(0, 0, 0));
+        lbl_horaEjecucion.setText("Ultima Hora Job");
+        lbl_horaEjecucion.setToolTipText("");
+        Panel_Replica.add(lbl_horaEjecucion);
+        lbl_horaEjecucion.setBounds(320, 40, 400, 20);
 
         Menu.add(Panel_Replica);
         Panel_Replica.setBounds(1230, 0, 1060, 580);
@@ -499,6 +521,31 @@ public class Loggin extends javax.swing.JFrame {
             @Override
             public void run() {
                 //aqui pones las lineas de la db para que aparezca la imagen 
+                if(!tablasAgregadas.isEmpty()){
+                    String nombreArchivo = "C:\\Users\\diego\\Documents\\queries.sql";
+                    ArrayList<String> queriesSQL = new ArrayList<String>();
+                    String useTable = "use " + dbNameSQLServer + ";"; 
+                    queriesSQL.add(useTable);
+                    obtenerQueries(queriesSQL);
+                    try (BufferedWriter cleanWriter = new BufferedWriter(new FileWriter(nombreArchivo, false))) {
+                        cleanWriter.write(""); // Escribir un string vacío para limpiar el archivo
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    // Escribir sentencias en el archivo
+                    try (BufferedWriter writer = new BufferedWriter(new FileWriter(nombreArchivo, true))) {
+                        for (String query : queriesSQL) {
+                            writer.write(query);
+                            writer.newLine(); // Agregar una nueva línea después de cada sentencia
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else{
+                    JOptionPane.showMessageDialog(null, "Debe de escoger tablas a ser replicadas");
+                }
                 jPanel5.setVisible(false);
             }
         });
@@ -577,6 +624,17 @@ public class Loggin extends javax.swing.JFrame {
             @Override
             public void run() {
                 //aqui pones las lineas de la db para que aparezca la imagen 
+                DefaultListModel<String> modeloDestino = (DefaultListModel<String>) Lista_Tablas_Replica.getModel();
+                System.out.println(tablasAgregadas.size());
+                for (int i = 0; i < tablasAgregadas.size(); i++) {
+                    String elemento = tablasAgregadas.get(i);
+                    System.out.println(elemento);
+                    if(modeloDestino.contains(elemento)){
+                        modeloDestino.removeElement(elemento);
+                    }
+                    
+                }
+                tablasAgregadas.clear();
                 jPanel5.setVisible(false);
             }
         });
@@ -627,9 +685,10 @@ public class Loggin extends javax.swing.JFrame {
             catch(SQLException e){
                 e.printStackTrace();
             }*/
-            listarTablasBDOrigen(Tabla_sin_replicar);
-            listarTablasBDReplica(Tabla_replicada);
-            verificarTablas(Tabla_sin_replicar,Tabla_replicada);
+            listarTablasBDOrigen(Lista_Tablas_Origen);
+            listarTablasBDReplica(Lista_Tablas_Replica);
+            deshabilitarElementosRepetidos(Lista_Tablas_Origen, Lista_Tablas_Replica);
+            obtenerDatosJob();
         }
         else{
             JOptionPane.showMessageDialog(null, "Debe Establecer Conexiones Primero");
@@ -647,6 +706,23 @@ public class Loggin extends javax.swing.JFrame {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
+                int[] indicesSeleccionados = Lista_Tablas_Origen.getSelectedIndices();
+
+                // Obtén el modelo de la lista de destino
+                DefaultListModel<String> modeloDestino = (DefaultListModel<String>) Lista_Tablas_Replica.getModel();
+
+                // Recorre los índices seleccionados y mueve los elementos a la lista de destino
+                for (int i = indicesSeleccionados.length - 1; i >= 0; i--) {
+                    String elemento = (String) Lista_Tablas_Origen.getModel().getElementAt(indicesSeleccionados[i]);
+                    if(modeloDestino.contains(elemento)){
+                        JOptionPane.showMessageDialog(null, "Tabla Ya Ha Sido Replicada");
+                    }
+                    else{
+                        modeloDestino.addElement(elemento); // Agrega el elemento a la lista de destino
+                        tablasAgregadas.add(elemento);
+                    }
+                    
+                }
                 //aqui pones las lineas de la db para que aparezca la imagen 
                 jPanel5.setVisible(false);
             }
@@ -675,6 +751,21 @@ public class Loggin extends javax.swing.JFrame {
             @Override
             public void run() {
                 //aqui pones las lineas de la db para que aparezca la imagen 
+                int[] indicesSeleccionados = Lista_Tablas_Replica.getSelectedIndices();
+                
+                DefaultListModel<String> modeloDestino = (DefaultListModel<String>) Lista_Tablas_Replica.getModel();
+                
+                for (int i = indicesSeleccionados.length - 1; i >= 0; i--) {
+                    String elemento = (String) Lista_Tablas_Replica.getModel().getElementAt(indicesSeleccionados[i]);
+                    if(tablasAgregadas.contains(elemento)){
+                        modeloDestino.removeElement(elemento);
+                        tablasAgregadas.remove(elemento);
+                    }
+                    else{
+                        JOptionPane.showMessageDialog(null, "Tabla ya ha sido replicada. No puede ser movida.");
+                    }
+                    
+                }
                 jPanel5.setVisible(false);
             }
         });
@@ -705,6 +796,23 @@ public class Loggin extends javax.swing.JFrame {
         System.exit(0);
         
     }//GEN-LAST:event_jLabel72MouseClicked
+
+    private void btn_JobMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_JobMouseClicked
+        // TODO add your handling code here:
+        String nombreJob = "JobEscrituraQueries"; // Nombre del job que has creado en SQL Server
+
+        try {
+            // Llamada al procedimiento almacenado que ejecuta el job
+            String sql = "EXEC msdb.dbo.sp_start_job @job_name = ?";
+            try (PreparedStatement stmt = conexSQLServer.conexion.prepareStatement(sql)) {
+                stmt.setString(1, nombreJob);
+                stmt.executeUpdate();
+                System.out.println("Job ejecutado correctamente desde Java.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_btn_JobMouseClicked
     private void establecerDatosMariaDB(){
         //Base de Datos Origen
         Nom_Insta_1.setText(hostMariaDB);
@@ -721,82 +829,225 @@ public class Loggin extends javax.swing.JFrame {
         Nom_Usu2.setText(userNameSQLServer);
         Nom_Pass_2.setText(userPassSQLServer);
     }
-    private void listarTablasBDOrigen(JTable tablaOrigen){
-        
+    private void listarTablasBDOrigen(JList listaOrigen){
+        DefaultListModel<String> listModel = new DefaultListModel<>();
+
         // Consulta para obtener las tablas, excluyendo bitacoraOrigen
         String query = "SELECT TABLE_NAME FROM information_schema.tables WHERE TABLE_SCHEMA = 'prueba' AND TABLE_NAME != 'bitacoraOrigen';";
 
         try {
-            DefaultTableModel tableModel = (DefaultTableModel) tablaOrigen.getModel();
-            tableModel.setRowCount(0);
             Statement statement = conexMariaDB.conexion.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
-            // Obtener los nombres de las tablas y agregarlos al modelo de la tabla
+
+            // Obtener los nombres de las tablas y agregarlos al modelo de la lista
             while (resultSet.next()) {
-                Object[] rowData = {resultSet.getString("TABLE_NAME")};
-                tableModel.addRow(rowData);
+                String tableName = resultSet.getString("TABLE_NAME");
+                listModel.addElement(tableName);
             }
+
+            // Aplicar el modelo de la lista a la JList
+            listaOrigen.setModel(listModel);
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-    private void listarTablasBDReplica(JTable tablaReplica){
+    
+    private void listarTablasBDReplica(JList listaReplica){
+        DefaultListModel<String> listModel = new DefaultListModel<>();
+
         // Consulta para obtener las tablas, excluyendo bitacoraOrigen
-        
         String query = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME != 'bitacoraOrigen';";
 
         try {
-            DefaultTableModel tableModel = (DefaultTableModel) tablaReplica.getModel();
-            tableModel.setRowCount(0);
             Statement statement = conexSQLServer.conexion.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
-            // Obtener los nombres de las tablas y agregarlos al modelo de la tabla
+
+            // Obtener los nombres de las tablas y agregarlos al modelo de la lista
             while (resultSet.next()) {
-                String nombreTabla = resultSet.getString("TABLE_NAME");
-                Object[] rowData = {nombreTabla};
-                tableModel.addRow(rowData);
+                String tableName = resultSet.getString("TABLE_NAME");
+                listModel.addElement(tableName);
             }
+
+            // Aplicar el modelo de la lista a la JList
+            listaReplica.setModel(listModel);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }    
+    private void deshabilitarElementosRepetidos(JList<String> listaOrigen, JList<String> listaReplica) {
+        DefaultListModel<String> modelOrigen = (DefaultListModel<String>) listaOrigen.getModel();
+        DefaultListModel<String> modelReplica = (DefaultListModel<String>) listaReplica.getModel();
+        int sizeOrigen = modelOrigen.size();
+        int sizeReplica = modelReplica.size();
+
+        boolean[] enabledItems = new boolean[sizeOrigen > sizeReplica ? sizeOrigen : sizeReplica];
+
+        // Recorre la lista de origen y deshabilita elementos que están en la lista de réplica
+        for (int i = 0; i < sizeOrigen; i++) {
+            String itemOrigen = modelOrigen.get(i);
+            enabledItems[i] = !modelReplica.contains(itemOrigen);
+        }
+
+        // Si la lista de réplica tiene elementos adicionales, también los deshabilitamos
+        if (sizeReplica > sizeOrigen) {
+            for (int i = sizeOrigen; i < sizeReplica; i++) {
+                enabledItems[i] = false;
+            }
+        }
+
+        // Aplica el modelo personalizado a la lista de origen
+        DisabledItemsListModel listModel = new DisabledItemsListModel();
+        listModel.addAll(Collections.list(modelOrigen.elements())); // Agrega los elementos de la lista de origen
+        listModel.setEnabledItems(enabledItems);
+        listaOrigen.setModel(listModel);
+    }
+    private void obtenerQueries(ArrayList<String> queries){
+        try {
+            for (int i = 0; i < tablasAgregadas.size(); i++) {
+                Statement originStmt = conexMariaDB.conexion.createStatement();
+                String query = "SHOW CREATE TABLE " + tablasAgregadas.get(i) + ";";
+                ResultSet rs = originStmt.executeQuery(query);
+                while (rs.next()){
+                    String createTableStatement = rs.getString(2);
+                    System.out.println("Before \n" + createTableStatement);
+                    String newCreateTableStatement = convertMariaDBToSQLServer(createTableStatement);
+                    newCreateTableStatement = newCreateTableStatement + ";";
+                    System.out.println("After \n" +newCreateTableStatement);
+                    queries.add(newCreateTableStatement);
+                }
+                Statement insertStmt = conexMariaDB.conexion.createStatement();
+                String query2 = "SELECT * FROM " + tablasAgregadas.get(i) + ";";
+                ResultSet rs2 = insertStmt.executeQuery(query2);
+                
+                ResultSetMetaData rsmd = rs2.getMetaData();
+                int cantColumnas = rsmd.getColumnCount();
+                while (rs2.next()) {
+                    // Crear el query de insert
+                    String insertQuery = "INSERT INTO "+tablasAgregadas.get(i)+" VALUES (";
+                    
+                    // Agregar los valores de cada columna
+                    for (int j = 1; j <= cantColumnas; j++) {
+                        if (j > 1) { insertQuery += ","; }
+                        // Obtener el tipo de dato
+                        int columnType = rsmd.getColumnType(j);
+                        // Si es un dato de tipo string le agrega comillas simples
+                        if (columnType == Types.VARCHAR || columnType == Types.CHAR
+                                || columnType == Types.NVARCHAR || columnType == Types.NCHAR) {
+                            insertQuery += "'" + rs2.getString(j) + "'";
+                        }
+                        // Si es una fecha le pone formato de fecha
+                        else if (columnType == Types.DATE) {
+                            //insertQuery += "TO_DATE('"+rs2.getString(j)+"', 'YYYY-MM-DD')";
+                            insertQuery += rs2.getDate(j);
+                        }
+                        else if (columnType == Types.DECIMAL){
+                            insertQuery += rs2.getInt(j);
+                        }
+                    }
+                    insertQuery += ");";
+
+                    // Hacer el insert de la tupla en la BD destino
+                    queries.add(insertQuery);
+
+                }
+            }
+                
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+    }
+    public static String convertMariaDBToSQLServer(String mariaDBSql) {
+        
+        boolean hasMatches = false;
+        String sqlServerSql = mariaDBSql;
+        do{
+            sqlServerSql = mariaDBSql.replaceAll("int\\(\\d+\\)", "int");
+            sqlServerSql = mariaDBSql.replaceAll("varchar\\(\\d+\\)", "varchar");
+            sqlServerSql = mariaDBSql.replaceAll("AUTO_INCREMENT", "");
+
+            sqlServerSql = sqlServerSql.replaceAll("ENGINE=InnoDB", "");
+
+            //sqlServerSql = sqlServerSql.replaceAll("\\bKEY\\s+[^]+`\\s*\\([^)]*\\),", "");
+            sqlServerSql = sqlServerSql.replaceAll("DEFAULT CHARSET=armscii8 COLLATE=armscii8_bin", "");
+
+            
+            
+            sqlServerSql = sqlServerSql.replaceAll("`", "");
+
+
+            sqlServerSql = sqlServerSql.replaceAll("CHARACTER SET [^ ]+ COLLATE [^ ]+", "");
+
+            sqlServerSql = sqlServerSql.replaceAll("CONSTRAINT \\w+ FOREIGN KEY \\(([^)]+)\\) REFERENCES (\\w+) \\(([^)]+)\\) ON UPDATE CASCADE",
+                                        "FOREIGN KEY ($1) REFERENCES $2 ($3) ON UPDATE CASCADE");
+            
+            
+
+            
+            
+            if (!sqlServerSql.equals(mariaDBSql)) {
+                hasMatches = true;
+            }
+            
+        } while(hasMatches==false);
+        
+        return sqlServerSql;
+    }
+    private void obtenerDatosJob(){
+        try {
+            String sql = "SELECT TOP 1 J.name AS 'Nombre del Job', H.run_date AS 'Fecha de Ejecución', H.run_time AS 'Hora de Ejecución', H.run_duration AS 'Duración (en segundos)',\n" +
+                    "    CASE H.run_status\n" +
+                    "        WHEN 0 THEN 'Failed'\n" +
+                    "        WHEN 1 THEN 'Succeeded'\n" +
+                    "        WHEN 2 THEN 'Retry'\n" +
+                    "        WHEN 3 THEN 'Canceled'\n" +
+                    "        ELSE 'Unknown'\n" +
+                    "    END AS 'Estado'\n" +
+                    "FROM\n" +
+                    "    msdb.dbo.sysjobs J INNER JOIN msdb.dbo.sysjobhistory H ON J.job_id = H.job_id\n" +
+                    "WHERE\n" +
+                    "    J.name = 'JobEscrituraQueries'\n" +
+                    "ORDER BY\n" +
+                    "    H.run_date DESC, H.run_time DESC;";
+
+            Statement statement = conexSQLServer.conexion.createStatement();
+            ResultSet resultado = statement.executeQuery(sql);
+
+            // Procesar los resultados
+            while (resultado.next()) {
+                String fechaEjecucion = resultado.getString("Fecha de Ejecución");
+                String horaEjecucion = resultado.getString("Hora de Ejecución");
+
+                String fechaModificada = "";
+                String horaModificada = "";
+                for (int i = 0; i < fechaEjecucion.length(); i++) {
+                    if(i==3 || i==5){
+                        fechaModificada += fechaEjecucion.charAt(i) + "-";
+                    }
+                    else{
+                        fechaModificada += fechaEjecucion.charAt(i);
+                    }
+                }
+                for (int i = 0; i < horaEjecucion.length(); i++) {
+                    if(i==1 || i==3){
+                        horaModificada += horaEjecucion.charAt(i) + ":";
+                    }
+                    else{
+                        horaModificada += horaEjecucion.charAt(i);
+                    }
+                }
+                String newfechaModificada = "Ultima Fecha Que Se Llamo Job: " + fechaModificada;
+                String newhoraModificada = "Ultima Hora Que Se LLamo Job: " + horaModificada;
+                System.out.println(newfechaModificada);
+                System.out.println(newhoraModificada);
+                lbl_FechaEjecutada.setText(newfechaModificada);
+                lbl_horaEjecucion.setText(newhoraModificada);
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-    public void verificarTablas(JTable tablaOrigen, JTable tablaReplica){
-//        DefaultTableModel modeloTabla1 = (DefaultTableModel) tablaOrigen.getModel();
-//        int filas1 = modeloTabla1.getRowCount();
-//        ArrayList<String> elementosTabla1 = new ArrayList<>();
-//
-//        for (int fila = 0; fila < filas1; fila++) {
-//            Object valorCelda = modeloTabla1.getValueAt(fila, 0); // Obtener valor de la única columna (0-indexada)
-//            elementosTabla1.add(valorCelda.toString());
-//        }
-//        
-//        DefaultTableModel modeloTabla2 = (DefaultTableModel) tablaReplica.getModel();
-//        int filas2 = modeloTabla2.getRowCount();
-//        ArrayList<String> elementosTabla2 = new ArrayList<>();
-//
-//        for (int fila = 0; fila < filas2; fila++) {
-//            Object valorCelda = modeloTabla2.getValueAt(fila, 0); // Obtener valor de la única columna (0-indexada)
-//            elementosTabla2.add(valorCelda.toString());
-//        }
-        DefaultListSelectionModel modeloSeleccionOrigen = new DefaultListSelectionModel();
-        DefaultListSelectionModel modeloSeleccionReplica = new DefaultListSelectionModel();
-        for (int i = 0; i < tablaOrigen.getRowCount(); i++) {
-            Object nombreTabla1 = tablaOrigen.getValueAt(i, 0); // Suponiendo que la columna que contiene el nombre de la tabla es la primera (0-indexada)
-
-            for (int j = 0; j < tablaReplica.getRowCount(); j++) {
-                Object nombreTabla2 = tablaReplica.getValueAt(j, 0); // Suponiendo que la columna que contiene el nombre de la tabla es la primera (0-indexada)
-
-                if (nombreTabla1 != null && nombreTabla1.equals(nombreTabla2)) {
-                    modeloSeleccionOrigen.addSelectionInterval(i, i);
-                    modeloSeleccionReplica.addSelectionInterval(j, j);
-                    // Deshabilita la fila i en la tabla 1 y la fila j en la tabla 2
-                }
-            }
-        }
-        tablaOrigen.setSelectionModel(modeloSeleccionOrigen);
-        tablaReplica.setSelectionModel(modeloSeleccionReplica);
-    }
-    
     /**
      * @param args the command line arguments
      */
@@ -845,6 +1096,8 @@ public class Loggin extends javax.swing.JFrame {
     private javax.swing.JLabel Fondo5;
     private javax.swing.JLabel Icono_Conectado;
     private javax.swing.JLabel Icono_replica;
+    private javax.swing.JList<String> Lista_Tablas_Origen;
+    private javax.swing.JList<String> Lista_Tablas_Replica;
     private javax.swing.JPanel Menu;
     private javax.swing.JTextField Nom_BaseDato_1;
     private javax.swing.JTextField Nom_BaseDato_2;
@@ -858,8 +1111,7 @@ public class Loggin extends javax.swing.JFrame {
     private javax.swing.JTextField Nom_Usu2;
     private javax.swing.JPanel Panel_Conexiones;
     private javax.swing.JPanel Panel_Replica;
-    private javax.swing.JTable Tabla_replicada;
-    private javax.swing.JTable Tabla_sin_replicar;
+    private javax.swing.JButton btn_Job;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel23;
@@ -882,7 +1134,9 @@ public class Loggin extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
-    private javax.swing.JScrollPane jScrollPane5;
-    private javax.swing.JScrollPane jScrollPane6;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JLabel lbl_FechaEjecutada;
+    private javax.swing.JLabel lbl_horaEjecucion;
     // End of variables declaration//GEN-END:variables
 }
