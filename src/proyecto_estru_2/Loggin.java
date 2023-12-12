@@ -7,8 +7,11 @@ package proyecto_estru_2;
 import java.awt.Label;
 import java.sql.*;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Set;
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -22,18 +25,18 @@ public class Loggin extends javax.swing.JFrame {
     ConexionMariaDB conexMariaDB = new ConexionMariaDB();
     ConexionSQLServer conexSQLServer = new ConexionSQLServer();
     //Datos MariaDB
-    String hostMariaDB = "databasemariadb.c4rmmgpbufto.us-east-1.rds.amazonaws.com";
+    String hostMariaDB = "127.0.0.1";
     String portMariaDB = "3306";
     String dbNameMariaDB = "prueba";
-    String userNameMariaDB = "admin";
-    String userPassMariaDB = "admin123";
+    String userNameMariaDB = "root";
+    String userPassMariaDB = "admin";
     
     //Datos SQLServer
-    String hostSQLServer = "databasesqlserver.c4rmmgpbufto.us-east-1.rds.amazonaws.com";
+    String hostSQLServer = "localhost";
     String portSQLServer = "1433";
     String dbNameSQLServer = "prueba";
-    String userNameSQLServer = "admin";
-    String userPassSQLServer = "admin123";
+    String userNameSQLServer = "userProyecto";
+    String userPassSQLServer = "admin";
     public Loggin() {
         initComponents();
         this.setResizable(false);
@@ -364,9 +367,10 @@ public class Loggin extends javax.swing.JFrame {
 
             },
             new String [] {
-
+                "Tabla"
             }
         ));
+        Tabla_sin_replicar.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         jScrollPane5.setViewportView(Tabla_sin_replicar);
 
         Panel_Replica.add(jScrollPane5);
@@ -383,6 +387,14 @@ public class Loggin extends javax.swing.JFrame {
         Panel_Replica.add(Boton_Cancelar_Replicas);
         Boton_Cancelar_Replicas.setBounds(530, 490, 110, 40);
 
+        Tabla_replicada.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Tabla"
+            }
+        ));
         jScrollPane6.setViewportView(Tabla_replicada);
 
         Panel_Replica.add(jScrollPane6);
@@ -603,9 +615,10 @@ public class Loggin extends javax.swing.JFrame {
 
     private void Icono_replicaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Icono_replicaMouseClicked
         if(conexMariaDB.getConectado() == true && conexSQLServer.getConectado() == true){
+            
             Cambio_Menu CM= new Cambio_Menu(Panel_Replica,Panel_Conexiones);
             CM.start();
-            try{
+            /*try{
                 Statement st = conexMariaDB.conexion.createStatement();
                 String qt = "CALL CrearTriggerParaTablas();";
                 st.executeUpdate(qt);
@@ -613,7 +626,10 @@ public class Loggin extends javax.swing.JFrame {
             }
             catch(SQLException e){
                 e.printStackTrace();
-            }
+            }*/
+            listarTablasBDOrigen(Tabla_sin_replicar);
+            listarTablasBDReplica(Tabla_replicada);
+            verificarTablas(Tabla_sin_replicar,Tabla_replicada);
         }
         else{
             JOptionPane.showMessageDialog(null, "Debe Establecer Conexiones Primero");
@@ -705,6 +721,82 @@ public class Loggin extends javax.swing.JFrame {
         Nom_Usu2.setText(userNameSQLServer);
         Nom_Pass_2.setText(userPassSQLServer);
     }
+    private void listarTablasBDOrigen(JTable tablaOrigen){
+        
+        // Consulta para obtener las tablas, excluyendo bitacoraOrigen
+        String query = "SELECT TABLE_NAME FROM information_schema.tables WHERE TABLE_SCHEMA = 'prueba' AND TABLE_NAME != 'bitacoraOrigen';";
+
+        try {
+            DefaultTableModel tableModel = (DefaultTableModel) tablaOrigen.getModel();
+            tableModel.setRowCount(0);
+            Statement statement = conexMariaDB.conexion.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+            // Obtener los nombres de las tablas y agregarlos al modelo de la tabla
+            while (resultSet.next()) {
+                Object[] rowData = {resultSet.getString("TABLE_NAME")};
+                tableModel.addRow(rowData);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    private void listarTablasBDReplica(JTable tablaReplica){
+        // Consulta para obtener las tablas, excluyendo bitacoraOrigen
+        
+        String query = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME != 'bitacoraOrigen';";
+
+        try {
+            DefaultTableModel tableModel = (DefaultTableModel) tablaReplica.getModel();
+            tableModel.setRowCount(0);
+            Statement statement = conexSQLServer.conexion.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+            // Obtener los nombres de las tablas y agregarlos al modelo de la tabla
+            while (resultSet.next()) {
+                String nombreTabla = resultSet.getString("TABLE_NAME");
+                Object[] rowData = {nombreTabla};
+                tableModel.addRow(rowData);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    public void verificarTablas(JTable tablaOrigen, JTable tablaReplica){
+//        DefaultTableModel modeloTabla1 = (DefaultTableModel) tablaOrigen.getModel();
+//        int filas1 = modeloTabla1.getRowCount();
+//        ArrayList<String> elementosTabla1 = new ArrayList<>();
+//
+//        for (int fila = 0; fila < filas1; fila++) {
+//            Object valorCelda = modeloTabla1.getValueAt(fila, 0); // Obtener valor de la única columna (0-indexada)
+//            elementosTabla1.add(valorCelda.toString());
+//        }
+//        
+//        DefaultTableModel modeloTabla2 = (DefaultTableModel) tablaReplica.getModel();
+//        int filas2 = modeloTabla2.getRowCount();
+//        ArrayList<String> elementosTabla2 = new ArrayList<>();
+//
+//        for (int fila = 0; fila < filas2; fila++) {
+//            Object valorCelda = modeloTabla2.getValueAt(fila, 0); // Obtener valor de la única columna (0-indexada)
+//            elementosTabla2.add(valorCelda.toString());
+//        }
+        DefaultListSelectionModel modeloSeleccionOrigen = new DefaultListSelectionModel();
+        DefaultListSelectionModel modeloSeleccionReplica = new DefaultListSelectionModel();
+        for (int i = 0; i < tablaOrigen.getRowCount(); i++) {
+            Object nombreTabla1 = tablaOrigen.getValueAt(i, 0); // Suponiendo que la columna que contiene el nombre de la tabla es la primera (0-indexada)
+
+            for (int j = 0; j < tablaReplica.getRowCount(); j++) {
+                Object nombreTabla2 = tablaReplica.getValueAt(j, 0); // Suponiendo que la columna que contiene el nombre de la tabla es la primera (0-indexada)
+
+                if (nombreTabla1 != null && nombreTabla1.equals(nombreTabla2)) {
+                    modeloSeleccionOrigen.addSelectionInterval(i, i);
+                    modeloSeleccionReplica.addSelectionInterval(j, j);
+                    // Deshabilita la fila i en la tabla 1 y la fila j en la tabla 2
+                }
+            }
+        }
+        tablaOrigen.setSelectionModel(modeloSeleccionOrigen);
+        tablaReplica.setSelectionModel(modeloSeleccionReplica);
+    }
+    
     /**
      * @param args the command line arguments
      */
