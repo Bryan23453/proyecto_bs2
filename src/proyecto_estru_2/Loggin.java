@@ -547,6 +547,7 @@ public class Loggin extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(null, "Debe de escoger tablas a ser replicadas");
                 }
                 jPanel5.setVisible(false);
+                tablasAgregadas.clear();
             }
         });
         //aaqui termina
@@ -808,6 +809,7 @@ public class Loggin extends javax.swing.JFrame {
                 stmt.setString(1, nombreJob);
                 stmt.executeUpdate();
                 System.out.println("Job ejecutado correctamente desde Java.");
+                obtenerDatosJob();
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -856,7 +858,7 @@ public class Loggin extends javax.swing.JFrame {
         DefaultListModel<String> listModel = new DefaultListModel<>();
 
         // Consulta para obtener las tablas, excluyendo bitacoraOrigen
-        String query = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME != 'bitacoraOrigen';";
+        String query = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME != 'bitacoraDestino';";
 
         try {
             Statement statement = conexSQLServer.conexion.createStatement();
@@ -914,6 +916,8 @@ public class Loggin extends javax.swing.JFrame {
                     newCreateTableStatement = newCreateTableStatement + ";";
                     System.out.println("After \n" +newCreateTableStatement);
                     queries.add(newCreateTableStatement);
+                    String llamarProcedimiento = "EXEC ProcesoTablaCreada;";
+                    queries.add(llamarProcedimiento);
                 }
                 Statement insertStmt = conexMariaDB.conexion.createStatement();
                 String query2 = "SELECT * FROM " + tablasAgregadas.get(i) + ";";
@@ -957,23 +961,24 @@ public class Loggin extends javax.swing.JFrame {
         }
         
     }
+    
     public static String convertMariaDBToSQLServer(String mariaDBSql) {
         
         boolean hasMatches = false;
         String sqlServerSql = mariaDBSql;
         do{
-            sqlServerSql = mariaDBSql.replaceAll("int\\(\\d+\\)", "int");
-            sqlServerSql = mariaDBSql.replaceAll("varchar\\(\\d+\\)", "varchar");
-            sqlServerSql = mariaDBSql.replaceAll("AUTO_INCREMENT", "");
+            sqlServerSql = mariaDBSql.replaceAll("int\\((\\d+)\\)", "int")
+                         .replaceAll("varchar\\((\\d+)\\)", "varchar($1)")
+                         .replaceAll("AUTO_INCREMENT", "");
 
             sqlServerSql = sqlServerSql.replaceAll("ENGINE=InnoDB", "");
 
-            //sqlServerSql = sqlServerSql.replaceAll("\\bKEY\\s+[^]+`\\s*\\([^)]*\\),", "");
+            sqlServerSql = sqlServerSql.replaceAll("\\bPRIMARY\\s+KEY\\s*\\([^)]*\\),", "");
             sqlServerSql = sqlServerSql.replaceAll("DEFAULT CHARSET=armscii8 COLLATE=armscii8_bin", "");
 
             
             
-            sqlServerSql = sqlServerSql.replaceAll("`", "");
+            sqlServerSql = sqlServerSql.replaceAll("`", "").replaceAll("", "");
 
 
             sqlServerSql = sqlServerSql.replaceAll("CHARACTER SET [^ ]+ COLLATE [^ ]+", "");
@@ -981,6 +986,14 @@ public class Loggin extends javax.swing.JFrame {
             sqlServerSql = sqlServerSql.replaceAll("CONSTRAINT \\w+ FOREIGN KEY \\(([^)]+)\\) REFERENCES (\\w+) \\(([^)]+)\\) ON UPDATE CASCADE",
                                         "FOREIGN KEY ($1) REFERENCES $2 ($3) ON UPDATE CASCADE");
             
+            sqlServerSql = sqlServerSql.replaceAll("CONSTRAINT \\w+ FOREIGN KEY \\(([^)]+)\\) REFERENCES (\\w+) \\(([^)]+)\\) ON DELETE CASCADE",
+                                        "FOREIGN KEY ($1) REFERENCES $2 ($3) ON DELETE CASCADE");
+            
+            sqlServerSql = sqlServerSql.replaceAll("CONSTRAINT \\w+ FOREIGN KEY \\(([^)]+)\\) REFERENCES (\\w+) \\(([^)]+)\\) ON UPDATE SET NULL",
+                                        "FOREIGN KEY ($1) REFERENCES $2 ($3) ON UPDATE SET NULL");
+            
+            sqlServerSql = sqlServerSql.replaceAll("CONSTRAINT \\w+ FOREIGN KEY \\(([^)]+)\\) REFERENCES (\\w+) \\(([^)]+)\\) ON DELETE SET NULL",
+                                        "FOREIGN KEY ($1) REFERENCES $2 ($3) ON DELETE SET NULL");
             
 
             
@@ -991,6 +1004,7 @@ public class Loggin extends javax.swing.JFrame {
             
         } while(hasMatches==false);
         
+
         return sqlServerSql;
     }
     private void obtenerDatosJob(){
@@ -1037,7 +1051,7 @@ public class Loggin extends javax.swing.JFrame {
                     }
                 }
                 String newfechaModificada = "Ultima Fecha Que Se Llamo Job: " + fechaModificada;
-                String newhoraModificada = "Ultima Hora Que Se LLamo Job: " + horaModificada;
+                String newhoraModificada = "Ultima Hora Que Se Llamo Job: " + horaModificada;
                 System.out.println(newfechaModificada);
                 System.out.println(newhoraModificada);
                 lbl_FechaEjecutada.setText(newfechaModificada);
