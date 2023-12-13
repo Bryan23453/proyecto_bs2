@@ -522,7 +522,7 @@ public class Loggin extends javax.swing.JFrame {
             public void run() {
                 //aqui pones las lineas de la db para que aparezca la imagen 
                 if(!tablasAgregadas.isEmpty()){
-                    String nombreArchivo = "C:\\Users\\diego\\Documents\\queries.sql";
+                    String nombreArchivo = "queries.sql";
                     ArrayList<String> queriesSQL = new ArrayList<String>();
                     String useTable = "use " + dbNameSQLServer + ";"; 
                     queriesSQL.add(useTable);
